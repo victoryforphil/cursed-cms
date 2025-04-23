@@ -1,0 +1,49 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Asset model
+model Asset {
+  uuid               String         @id @default(uuid())
+  imported_fullpath  String
+  imported_filename  String
+  stored_fullpath    String
+  stored_url         String
+  size               Int
+  stored_filename    String
+  extension          String
+  hash               String?
+  uploaded_at        DateTime       @default(now())
+  
+  // Relations - made optional by changing ? to indicate nullable relationship
+  meta_base          AssetMetaBase?
+  
+  @@map("assets")
+}
+
+// Base Asset Metadata model
+model AssetMetaBase {
+  id                  String  @id @default(uuid())
+  asset_type          String
+  asset_class         String
+  asset_location_name String
+  asset_camera        String
+  asset_date_label    String
+  
+  // Relations
+  asset               Asset   @relation(fields: [asset_id], references: [uuid])
+  asset_id            String  @unique
+  
+  @@map("asset_meta_base")
+}
